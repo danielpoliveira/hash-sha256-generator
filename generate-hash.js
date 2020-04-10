@@ -1,10 +1,20 @@
-const Keygen = async (message) => {
+global.crypto = require('crypto');
+let readline = require('readline');
 
-  const messageBuffer = new TextEncoder('utf-8').encode(message);
-  const hashBuffer    = await crypto.subtle.digest('SHA-256', messageBuffer);
-  const hashArray     = Array.from(new Uint8Array(hashBuffer));
-
-  const hashHex       = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join('');
-
-  return hashHex;
+const Keygen = function (message) {
+  return crypto.createHash('sha256').update(message).digest('hex');  
 }
+
+let input = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+input.question("Type your password: \n", function(password) {
+  const hash = Keygen(password);
+
+  console.log('You normal password             : ', password);
+  console.log('You encrypted password (SHA-256): ', hash);
+  
+  input.close();
+});
